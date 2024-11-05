@@ -1,28 +1,66 @@
 import os
-from flask import Blueprint, render_template, g, redirect, send_from_directory, url_for, request, flash, current_app
+from flask import Blueprint, render_template, g, redirect, send_from_directory, url_for, request, flash, current_app, session
 from app.models import Lva, User, Exercise, Grade, Assignment, Registration
 from app import db
 from werkzeug.utils import secure_filename
+from flask_oidc import OpenIDConnect
+from app import app
 
 routes = Blueprint('routes', __name__)
-
+oidc = OpenIDConnect(app)
 @routes.route('/')
 def index():
-    user = User.query.filter_by(email="student1@example.com").first()
-    #user = User.query.filter_by(email="instructor2@example.com").first()
-    lvas = Lva.query.all()
+    if oidc.user_loggedin:  # Wenn der Nutzer eingeloggt ist
+        user_info = oidc.user_getinfo(all)  # Rolleninformationen abrufen
+        print("UserInfo:", user_info)
+        roles = user_info.get('roles', [])
+        user_email = oidc.user_getfield("email")  # Holen der Mail aus dem Token
 
-    lva_von_leiter = Lva.query.filter_by(instructor_id=user.id).first()#all falls lva leiter mehrere lvas hat
-    if lva_von_leiter is not None:
-        registrations = Registration.query.filter_by(lva_id=lva_von_leiter.lva_number).all()
-    else:
-        registrations = []
+        # Überprüfen der Rolle
+        if "student" in roles:
+            user_type = "Student"
+        elif "professor" in roles:
+            user_type = "Professor"
+        else:
+            print("User ist weder Student noch Professor")
+            user_type = "Student"
 
-    if user.role=='student':
-        return render_template('student.html', lvas = lvas, user = user)
-    else:
-        return render_template('lva-leiter.html', registrations=registrations, user = user)
+        user = User.query.filter_by(email=user_email).first()   # <- Nimmt die Email- ADresse aus dem Keycloak Token und filtert nach dieser in der DB
+        #user = User.query.filter_by(email="student1@example.com").first()
+        #user = User.query.filter_by(email="instructor2@example.com").first()
+        lvas = Lva.query.all()
+
+        lva_von_leiter = Lva.query.filter_by(instructor_id=user.id).first()#all falls lva leiter mehrere lvas hat
+        if lva_von_leiter is not None:
+            registrations = Registration.query.filter_by(lva_id=lva_von_leiter.lva_number).all()
+        else:
+            registrations = []
+
+        if user_type!='professor':
+            return render_template('student.html', lvas = lvas, user = user)
+        else:
+            return render_template('lva-leiter.html', registrations=registrations, user = user)
+    else:   # Falls der User nicht eingeloggt ist:
+        return '''
+                    <h1>Welcome to LVA-Manager 3000!</h1>
+                    <p>You are not logged in.</p>
+                    <a href="/login"><button>Log in</button></a>
+                '''
     
+@routes.route('/logout', methods=['POST'])
+def logout():
+    print("User Logout")
+    # Keycloak-Logout-URL mit Token und redirect_uri
+    #id_token = oidc.get_access_token()
+    oidc.logout()      # Lokale Flask-Session beenden
+    session.clear()  # Zusätzliche Sicherheit, um die Sitzung zu bereinigen
+
+    keycloak_logout_url = (
+        "http://localhost:8080/realms/lvaManager/protocol/openid-connect/logout"
+    )
+
+    # Weiterleitung zur Keycloak-Logout-Seite
+    return redirect(keycloak_logout_url)
 
 @routes.route('/Lva/<int:lva_number>')
 def lva(lva_number):
