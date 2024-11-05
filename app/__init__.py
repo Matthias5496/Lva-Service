@@ -3,6 +3,8 @@ from flask import Flask, g
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_migrate import Migrate
+#from flask_oidc import OpenIDConnect
+
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
@@ -12,6 +14,17 @@ app.config['SECRET_KEY'] = 'asdf'
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
 db.init_app(app)
 migrate = Migrate(app, db)
+
+# Keycloak OIDC-Konfiguration
+app.config.update({
+    'SESSION_TYPE': 'filesystem',
+    #'SECRET_KEY': 'you_will_never_guess',
+    'OIDC_CLIENT_SECRETS': 'client_secrets.json',
+    'OIDC_SCOPES': ['openid', 'email', 'profile'],
+    'OIDC_INTROSPECTION_AUTH_METHOD': 'client_secret_post',
+    #'OIDC_ID_TOKEN_COOKIE_SECURE': False  # Für lokale Tests http statt https erlauben
+})
+
 
 def create_database(app):
     if not path.exists('website/' + DB_NAME):
