@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Lehrveranstaltungen:</h1>
+    <ul class="list-group">
+    {% for lva in lvas: %}
+    <li class="list-group-item"><a href="{{ url_for('routes.lva', lva_number = lva.lva_number) }}">{{lva.title}}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}

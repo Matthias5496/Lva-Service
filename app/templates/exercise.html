@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>{{ exercise.title }}</h1>
+    <h3>{{ exercise.description }}</h3>
+    <h3>Abgabe:</h3>
+   
+
+    <form action="{{ url_for('routes.submit_assignment', exercise_id=exercise.id) }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="file">PDF-Datei hochladen:</label>
+            <input type="file" name="file" id="file" accept="application/pdf" class="form-control">
+        </div> 
+        {% if assignment %}
+            <p style="color: lightgreen;">Bereits abgegeben: {{ assignment.file_path }}</p>
+        {% endif %}
+        <br>
+        <button type="submit" class="btn btn-primary">
+            {% if assignment %}Überschreiben{% else %}Abgeben{% endif %}
+        </button>
+    </form>
+    <br>
+    {% if assignment.grade: %}
+        <h6>Bewertung: {{ assignment.grade.grade }} Punkte</h6>
+    {% else: %}
+        <h6>Bewertung: nicht bewertet</h6>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,13 @@
+a {
+    display: block;
+    text-decoration: none;
+    color: black;
+}
+.list-group-item:hover {
+    background-color: #0d6efd;
+}
+  
+.list-group-item:hover a {
+    color: white;
+}
+

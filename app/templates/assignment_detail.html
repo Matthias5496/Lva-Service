@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+    <h5>Assignment: {{ assignment.exercise.title }}</h5>
+    <h6>Von: {{ student.firstname }} {{ student.lastname }}</h6>
+    
+    <!-- Download Link -->
+    <a href="{{ url_for('routes.download_assignment', assignment_id=assignment.id) }}" class="btn btn-secondary">
+        Datei herunterladen
+    </a>
+    <br>
+    <br>
+    <!-- Formular zur Bewertung -->
+    <form action="{{ url_for('routes.grade_assignment', assignment_id=assignment.id) }}" method="POST">
+        <div class="form-group">
+            <label for="grade">Bewertung (0-100):</label>
+            <input type="number" name="grade" id="grade" class="form-control" min="0" max="100" required>
+        </div>
+        {% if assignment.grade: %}
+            <h6>Bewertung: {{ assignment.grade.grade }} Punkte</h6>
+            <br>
+            <button type="submit" class="btn btn-primary">Bewertung überschreiben</button>
+        {% else: %}
+            <h6>Bewertung: nicht bewertet</h6>
+            <br>
+            <button type="submit" class="btn btn-primary">Bewertung abgeben</button>
+        {% endif %}
+        
+    </form>
+    <br>
+    
+    
+{% endblock %}

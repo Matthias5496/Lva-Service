@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="display-4 text-primary">{{ lva.title }}</h1>
+        <p class="lead text-secondary mb-4">{{ lva.description }}</p>
+
+        <div class="mb-4">
+            <h5 class="text-muted">Lva-Leiter:</h5>
+            <p class="h5">{{ lva.instructor.firstname }} {{ lva.instructor.lastname }}</p>
+        </div>
+
+        <!-- Anmeldung -->
+        <div class="mb-4">
+            <h5 class="text-muted">Anmeldung:</h5>
+            {% if not is_registered %}
+                <form action="{{ url_for('routes.register_lva', lva_number=lva.lva_number) }}" method="post">
+                    <button type="submit" class="btn btn-success">Anmelden</button>
+                </form>
+            {% else %}
+                <p class="h5 text-success">Sie sind bereits angemeldet</p>
+            {% endif %}
+        </div>
+
+        <!-- Übungen -->
+        {% if is_registered %}
+            <h2 class="h4 text-primary mt-4">Übungen</h2>
+            <ul class="list-group mt-3">
+                {% for exercise in exercises %}
+                    <li class="list-group-item">
+                        <a href="{{ url_for('routes.exercise', lva_number=lva.lva_number, exercise_id=exercise.id) }}" 
+                           class="text-decoration-none text-dark">
+                            {{ exercise.title }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endblock %}
+
+

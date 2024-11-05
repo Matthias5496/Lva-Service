@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Registrierte Studenten:</h1>
+    <ul class="list-group">
+    {% for registration in registrations: %}
+    <li class="list-group-item"><a href="{{ url_for('routes.assignments', student_id = registration.student.id) }}">{{registration.student.firstname }} {{registration.student.lastname }}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}
