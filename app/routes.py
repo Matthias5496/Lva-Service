@@ -5,7 +5,7 @@ from app import db
 from werkzeug.utils import secure_filename
 
 routes = Blueprint('routes', __name__)
-
+#hallo
 @routes.route('/')
 def index():
     user = User.query.filter_by(email="student1@example.com").first()
