@@ -8,29 +8,31 @@ from app import app
 
 routes = Blueprint('routes', __name__)
 oidc = OpenIDConnect(app)
+
 @routes.route('/')
 def index():
     if oidc.user_loggedin:  # Wenn der Nutzer eingeloggt ist
         user_info = oidc.user_getinfo(all)  # Rolleninformationen abrufen
         print("UserInfo:", user_info)
         roles = user_info.get('roles', [])
-        user_email = oidc.user_getfield("email")  # Holen der Mail aus dem Token
+        #user_email = oidc.user_getfield("email")  # Holen der Mail aus dem Token
 
-        # Überprüfen der Rolle
-        if "student" in roles:
-            user_type = "Student"
-        elif "professor" in roles:
-            user_type = "Professor"
+        # Überprüfen der Rolle -> ist eigentlich nicht notwendig
+        if "professor" in roles:
+            user_type = "professor"
+        elif "student" in roles:
+            user_type = "student"
         else:
-            print("User ist weder Student noch Professor")
-            user_type = "Student"
+            print("User ist weder Student noch Professor!")
+            user_type = "student" # wird als Student behandelt
 
-        user = User.query.filter_by(email=user_email).first()   # <- Nimmt die Email- ADresse aus dem Keycloak Token und filtert nach dieser in der DB
+        user = User.query.filter_by(email=oidc.user_getfield("email")).first()   # <- Nimmt die Email- Adresse aus dem Keycloak Token und sucht nach dieser in der DB
         #user = User.query.filter_by(email="student1@example.com").first()
         #user = User.query.filter_by(email="instructor2@example.com").first()
         lvas = Lva.query.all()
 
-        lva_von_leiter = Lva.query.filter_by(instructor_id=user.id).first()#all falls lva leiter mehrere lvas hat
+# Problem: es wird nur eine LVA pro LVA-Leiter angezeigt
+        lva_von_leiter = Lva.query.filter_by(instructor_id=user.id).first()     #all falls lva leiter mehrere lvas hat
         if lva_von_leiter is not None:
             registrations = Registration.query.filter_by(lva_id=lva_von_leiter.lva_number).all()
         else:
@@ -39,13 +41,14 @@ def index():
         if user_type!='professor':
             return render_template('student.html', lvas = lvas, user = user)
         else:
-            return render_template('lva-leiter.html', registrations=registrations, user = user)
+            return render_template('lva-leiter.html', registrations=registrations, user = user, lva_von_leiter = lva_von_leiter)
     else:   # Falls der User nicht eingeloggt ist:
-        return '''
-                    <h1>Welcome to LVA-Manager 3000!</h1>
-                    <p>You are not logged in.</p>
-                    <a href="/login"><button>Log in</button></a>
-                '''
+            return render_template('login.html')
+        #return '''
+        #            <h1>Welcome to LVA-Manager 3000!</h1>
+        #            <p>You are not logged in.</p>
+        #           <a href="/login"><button>Log in</button></a>
+        #        '''
     
 @routes.route('/logout', methods=['POST'])
 def logout():
@@ -64,7 +67,7 @@ def logout():
 
 @routes.route('/Lva/<int:lva_number>')
 def lva(lva_number):
-    user = User.query.filter_by(email="student1@example.com").first()
+    user = User.query.filter_by(email=oidc.user_getfield("email")).first()
     lva = Lva.query.get_or_404(lva_number)
     is_registered = Registration.query.filter_by(student_id = user.id, lva_id = lva_number).first() is not None
     exercises = Exercise.query.filter_by(lva_id=lva_number).all()
@@ -73,7 +76,7 @@ def lva(lva_number):
 
 @routes.route('/Lva/<int:lva_number>/register', methods=['POST'])
 def register_lva(lva_number):
-    user = User.query.filter_by(email="student1@example.com").first()
+    user = User.query.filter_by(email=oidc.user_getfield("email")).first()
 
     # Anmeldung zum Kurs
     registration = Registration(student_id=user.id, lva_id=lva_number)
@@ -84,7 +87,7 @@ def register_lva(lva_number):
 
 @routes.route('/exercise/<int:exercise_id>')
 def exercise(exercise_id):
-    user = User.query.filter_by(email="student1@example.com").first()
+    user = User.query.filter_by(email=oidc.user_getfield("email")).first()
     exercise = Exercise.query.get_or_404(exercise_id)
     assignment = Assignment.query.filter_by(student_id=user.id, exercise_id=exercise_id).first()
     return render_template('exercise.html', user = user, exercise=exercise, assignment=assignment)
@@ -100,7 +103,7 @@ def allowed_file(filename):
 
 @routes.route('/student/<int:student_id>/assignments')
 def assignments(student_id):
-    user = User.query.filter_by(email="instructor2@example.com").first()
+    user = User.query.filter_by(email=oidc.user_getfield("email")).first()
 
     assignments = Assignment.query.filter_by(student_id=student_id).all()
     student = User.query.filter_by(id=student_id).first()
@@ -109,9 +112,10 @@ def assignments(student_id):
 
 @routes.route('/student/<int:student_id>/assignments/<int:assignment_id>')
 def assignment_detail(student_id, assignment_id):
+    user_info = oidc.user_getinfo(all)
     assignment = Assignment.query.filter_by(id=assignment_id).first()
     student = User.query.filter_by(id=student_id).first()
-    return render_template('assignment_detail.html', assignment = assignment, student=student)
+    return render_template('assignment_detail.html', assignment = assignment, student=student, user = user_info)
 
 @routes.route('/assignments/<int:assignment_id>/download')
 def download_assignment(assignment_id):
@@ -155,7 +159,7 @@ def grade_assignment(assignment_id):
 
 @routes.route('/exercise/<int:exercise_id>/submit', methods=['POST'])
 def submit_assignment(exercise_id):
-    user = User.query.filter_by(email="student1@example.com").first()  # Replace this with the logged-in user
+    user = User.query.filter_by(email=oidc.user_getfield("email")).first()
 
     if 'file' not in request.files:
         flash('No file part')
