@@ -5,10 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="34f40193-5a38-4556-a58a-ba895982e776" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/dab5d3f5-3b2a-4864-8b51-8797b5577bc7.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/dab5d3f5-3b2a-4864-8b51-8797b5577bc7/storage_v2/_src_/schema/main.uQUzAA.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.flaskenv" beforeDir="false" afterPath="$PROJECT_DIR$/.flaskenv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/dab5d3f5-3b2a-4864-8b51-8797b5577bc7.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/dab5d3f5-3b2a-4864-8b51-8797b5577bc7.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LVAService.py" beforeDir="false" afterPath="$PROJECT_DIR$/LVAService.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/__init__.py" afterDir="false" />
@@ -5083,7 +5082,7 @@
       <workItem from="1730821996274" duration="3061000" />
       <workItem from="1730833695347" duration="1824000" />
       <workItem from="1730896493325" duration="6352000" />
-      <workItem from="1731063807097" duration="8996000" />
+      <workItem from="1731063807097" duration="9102000" />
     </task>
     <servers />
   </component>
