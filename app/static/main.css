@@ -11,3 +11,39 @@ a {
     color: white;
 }
 
+.logout-form {
+    position: absolute;
+    top: 10px; /* Abstand von oben */
+    right: 20px; /* Abstand von rechts */
+}
+
+.home-form {
+    position: absolute;
+    top: 10px; /* Abstand von oben */
+    left: 20px; /* Abstand von links */
+}
+
+.loggedIn-user {
+    margin-top: 16px; /* Abstand von oben */
+    color: dodgerblue;
+}
+
+.elegant-button {
+  background-color: #1E90FF; /* Elegantes Blau */
+  color: white; /* Weißer Text */
+  border: none; /* Keine Randlinie */
+  border-radius: 8px; /* Abgerundete Ecken */
+  padding: 8px 8px; /* Innenabstand */
+  font-size: 16px; /* Schriftgröße */
+  font-weight: 500; /* Schriftstärke */
+  cursor: pointer; /* Mauszeiger bei Hover */
+  transition: all 0.3s ease; /* Weiche Übergänge */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Schatten für Tiefe */
+}
+
+.elegant-button:hover {
+  background-color: #0f78d4; /* Dunkleres Blau beim Hover */
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* Tieferer Schatten */
+}
+
+
