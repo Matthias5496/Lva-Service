@@ -3,7 +3,7 @@ from flask import Flask, g
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_migrate import Migrate
-#from flask_oidc import OpenIDConnect
+
 
 
 db = SQLAlchemy()
