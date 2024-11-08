@@ -9,6 +9,10 @@
     <title>{% block title %}Home{% endblock %}</title>
 </head>
 <body>
+
+
+
+
     <!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" >
             <span class="navbar-toggler-icon"></span>
@@ -20,7 +24,17 @@
         </div>
     </nav> -->
     <div class="container">
-        {% block content %}{% endblock %}
+        <form action="/" class="home-form">
+            <button class="elegant-button" type="submit">Home</button>
+        </form>
+
+        <h5 align = right class="loggedIn-user">logged in as {{user.email}} ({{user.firstname}} {{user.lastname}})</h5>
+
+        <form action="/logout" method="post" class="logout-form">
+            <button class="elegant-button" type="submit">Logout</button>
+        </form>
+        {% block content %}
+        {% endblock %}
     </div>
 
 

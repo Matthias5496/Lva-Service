@@ -2,3 +2,7 @@ Flask==3.0.3
 Flask_Migrate==4.0.7
 flask_sqlalchemy==3.1.1
 Werkzeug==3.1.2
+
+app~=0.0.1
+Flask-Migrate~=4.0.7
+flask-oidc~=2.2.2
