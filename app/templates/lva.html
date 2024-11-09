@@ -18,6 +18,9 @@
                 </form>
             {% else %}
                 <p class="h5 text-success">Sie sind bereits angemeldet</p>
+                <form action="{{ url_for('routes.deregister_lva', lva_number=lva.lva_number) }}" method="post">
+                    <button type="submit" class="btn btn-danger">Abmelden</button>
+                </form>
             {% endif %}
         </div>
 

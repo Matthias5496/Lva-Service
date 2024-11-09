@@ -1,10 +1,28 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>{{lva_von_leiter.title}}</h1>
-    <h4>Registrierte Studenten:</h4>
-    <ul class="list-group">
-    {% for registration in registrations: %}
-    <li class="list-group-item"><a href="{{ url_for('routes.assignments', student_id = registration.student.id) }}">{{registration.student.firstname }} {{registration.student.lastname }}</a></li>
-    {% endfor %}
-    </ul>
+    <div class="container mt-5">
+        <h1 class="mb-4">Registrierte Studenten</h1>
+        <div class="column">
+            {% for lva in lvaLeiter_lvas %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h2 class="h5 mb-0">{{ lva.title }}</h2>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                {% for registration in lva.registrations %}
+                                    <li class="list-group-item">
+                                        <a href="{{ url_for('routes.assignments', student_id=registration.student.id, lva_id=lva.lva_number) }}" class="text-decoration-none">
+                                            {{ registration.student.firstname }} {{ registration.student.lastname }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}

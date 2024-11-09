@@ -17,7 +17,7 @@ def index():
         roles = user_info.get('roles', [])
         #user_email = oidc.user_getfield("email")  # Holen der Mail aus dem Token
 
-        # Überprüfen der Rolle -> ist eigentlich nicht notwendig
+        # Überprüfen der Rolle
         if "professor" in roles:
             user_type = "professor"
         elif "student" in roles:
@@ -32,16 +32,18 @@ def index():
         lvas = Lva.query.all()
 
 # Problem: es wird nur eine LVA pro LVA-Leiter angezeigt
-        lva_von_leiter = Lva.query.filter_by(instructor_id=user.id).first()     #all falls lva leiter mehrere lvas hat
-        if lva_von_leiter is not None:
-            registrations = Registration.query.filter_by(lva_id=lva_von_leiter.lva_number).all()
-        else:
-            registrations = []
+        #lva_von_leiter = Lva.query.filter_by(instructor_id=user.id).first()     #all falls lva leiter mehrere lvas hat
+        lvaLeiter_lvas = Lva.query.filter_by(instructor_id=user.id).all()
+
+       # if lva_von_leiter is not None:
+        #    registrations = Registration.query.filter_by(lva_id=lva_von_leiter.lva_number).all()
+       # else:
+        #    registrations = []
 
         if user_type!='professor':
             return render_template('student.html', lvas = lvas, user = user)
         else:
-            return render_template('lva-leiter.html', registrations=registrations, user = user, lva_von_leiter = lva_von_leiter)
+            return render_template('lva-leiter.html', lvaLeiter_lvas = lvaLeiter_lvas, user = user)
     else:   # Falls der User nicht eingeloggt ist:
             return render_template('login.html')
         #return '''
@@ -84,6 +86,15 @@ def register_lva(lva_number):
     db.session.commit()
     return redirect(url_for('routes.lva', lva_number=lva_number))
 
+@routes.route('/Lva/<int:lva_number>/deregister', methods=['POST'])
+def deregister_lva(lva_number):
+    user = User.query.filter_by(email=oidc.user_getfield("email")).first()
+    registration = Registration.query.filter_by(student_id = user.id, lva_id = lva_number).first()
+    if registration:
+        db.session.delete(registration)
+        db.session.commit()
+    return redirect(url_for('routes.lva', lva_number=lva_number))
+
 
 @routes.route('/exercise/<int:exercise_id>')
 def exercise(exercise_id):
@@ -101,21 +112,22 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@routes.route('/student/<int:student_id>/assignments')
-def assignments(student_id):
+@routes.route('/student/<int:student_id>/assignments/<int:lva_id>')
+def assignments(student_id, lva_id):
     user = User.query.filter_by(email=oidc.user_getfield("email")).first()
-
-    assignments = Assignment.query.filter_by(student_id=student_id).all()
     student = User.query.filter_by(id=student_id).first()
+    lva = Lva.query.filter_by(lva_number=lva_id).first()
 
-    return render_template('assignments.html', assignments = assignments, student=student, user = user)
+    return render_template('assignments.html', student=student, user = user, lva = lva)
 
-@routes.route('/student/<int:student_id>/assignments/<int:assignment_id>')
+
+@routes.route('/student/<int:student_id>/assignments_detail/<int:assignment_id>')
 def assignment_detail(student_id, assignment_id):
-    user_info = oidc.user_getinfo(all)
+    user = User.query.filter_by(email=oidc.user_getfield("email")).first()
     assignment = Assignment.query.filter_by(id=assignment_id).first()
     student = User.query.filter_by(id=student_id).first()
-    return render_template('assignment_detail.html', assignment = assignment, student=student, user = user_info)
+    return render_template('assignment_detail.html', assignment = assignment, student=student, user = user)
+
 
 @routes.route('/assignments/<int:assignment_id>/download')
 def download_assignment(assignment_id):

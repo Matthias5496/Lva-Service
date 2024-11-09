@@ -2,10 +2,12 @@
 {% block content %}
     <h3>Assignments von: {{ student.firstname }} {{ student.lastname }}</h3>
     <ul class="list-group">
-    {% for assignment in assignments %}
-    {% if assignment.exercise.lva.instructor_id == user.id %}
-    <li class="list-group-item"><a href="{{ url_for('routes.assignment_detail', student_id = assignment.student.id, assignment_id = assignment.id) }}">Assignment für {{ assignment.exercise.title }} </a></li>
-    {% endif %}
+    {% for exercise in lva.exercises %}
+        {% for assignment in exercise.assignments %}
+            {% if assignment.student_id == student.id %}
+                <li class="list-group-item"><a href="{{ url_for('routes.assignment_detail', student_id = student.id, assignment_id = assignment.id) }}">Assignment für {{ assignment.exercise.title }} </a></li>
+            {% endif %}
+        {% endfor %}
     {% endfor %}
     </ul>
     
